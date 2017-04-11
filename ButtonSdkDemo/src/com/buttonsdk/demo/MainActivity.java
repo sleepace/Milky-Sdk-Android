@@ -1,23 +1,11 @@
 package com.buttonsdk.demo;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-
-import com.medica.buttonsdk.bluetooth.ButtonHelper;
-import com.medica.buttonsdk.domain.BleDevice;
-import com.medica.buttonsdk.domain.Detail;
-import com.medica.buttonsdk.domain.SleepStatus;
-import com.medica.buttonsdk.domain.Summary;
-import com.medica.buttonsdk.interfs.BleStateChangedListener;
-import com.medica.buttonsdk.interfs.Method;
-import com.medica.buttonsdk.interfs.ResultCallback;
-import com.medica.buttonsdk.interfs.SleepStatusListener;
-import com.medica.buttonsdk.interfs.UpgradeCallback;
-import com.medica.jni.milky.MilkyAnalysJni;
-import com.medica.jni.milky.MilkyAnalysOut;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -36,6 +24,19 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import com.medica.buttonsdk.bluetooth.ButtonHelper;
+import com.medica.buttonsdk.domain.BleDevice;
+import com.medica.buttonsdk.domain.Detail;
+import com.medica.buttonsdk.domain.SleepStatus;
+import com.medica.buttonsdk.domain.Summary;
+import com.medica.buttonsdk.interfs.BleStateChangedListener;
+import com.medica.buttonsdk.interfs.Method;
+import com.medica.buttonsdk.interfs.ResultCallback;
+import com.medica.buttonsdk.interfs.SleepStatusListener;
+import com.medica.buttonsdk.interfs.UpgradeCallback;
+import com.medica.jni.milky.MilkyAnalysJni;
+import com.medica.jni.milky.MilkyAnalysOut;
 
 public class MainActivity extends Activity{
 	private static final String TAG = MainActivity.class.getSimpleName();
@@ -72,7 +73,7 @@ public class MainActivity extends Activity{
 		
 		IntentFilter filter = new IntentFilter(ButtonHelper.ACTION_LOW_POWER);
 		registerReceiver(lowPowerReceiver, filter);
-		
+		 
 		gridView = (GridView) findViewById(R.id.gridview);
 		adapter = new GridAdapter();
 		gridView.setAdapter(adapter);
@@ -97,10 +98,10 @@ public class MainActivity extends Activity{
 				startActivityForResult(intent, REQCODE_SEACH_DEVICE);
 			}else{
 				
-				if(selectedBleDevice == null){
+				/*if(selectedBleDevice == null){
 					Toast.makeText(MainActivity.this, "请先选择设备", Toast.LENGTH_SHORT).show();
 					return;
-				}
+				}*/
 				
 				if(position == 1){//连接设备
 					btnHelper.connDevice(selectedBleDevice, resultCallback);
@@ -127,6 +128,8 @@ public class MainActivity extends Activity{
 				}else if(position == 9){//查询详细信息
 					btnHelper.queryHistoryDetail(summary, resultCallback);
 				}else if(position == 10){//睡眠分析
+					summary = new Summary();
+					detail = new Detail();
 					if(summary != null && detail != null){
 						MilkyAnalysOut analysis = MilkyAnalysJni.analysis(summary.startTime, detail);
 						int score = analysis == null ? -1 : analysis.sleepscore;
@@ -159,8 +162,9 @@ public class MainActivity extends Activity{
 				}else if(position == 13){//当前版本
 					btnHelper.getDeviceVersion(resultCallback);
 				}else if(position == 14){//固件升级
-					//File file = null;
-					//restonHelper.upgradeFirmwareByThread(Constants.DEVICE_TYPE_RESTON_Z1, 3.0f, 0, 0, file, upgradeCallback);
+					File file = new File("/storage/emulated/0/a.des");
+                     
+					btnHelper.upgradeFirmwareByThread(1.69f, 0, 0, file, upgradeCallback);
 				}else if(position == 15){//断开设备
 					btnHelper.disconnect();
 				}else if(position == 16){//同步时间
