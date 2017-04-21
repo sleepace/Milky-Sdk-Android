@@ -164,7 +164,7 @@ public class MainActivity extends Activity{
 				}else if(position == 14){//固件升级
 					File file = new File("/storage/emulated/0/a.des");
                      
-					btnHelper.upgradeFirmwareByThread(1.69f, 0, 0, file, upgradeCallback);
+					btnHelper.upgradeFirmwareByThread(1.38f, (int)2763936600l, (int)1113535353, file, upgradeCallback);
 				}else if(position == 15){//断开设备
 					btnHelper.disconnect();
 				}else if(position == 16){//同步时间
