@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -26,6 +27,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.medica.buttonsdk.bluetooth.ButtonHelper;
+import com.medica.buttonsdk.bluetooth.SleepData;
 import com.medica.buttonsdk.domain.BleDevice;
 import com.medica.buttonsdk.domain.Detail;
 import com.medica.buttonsdk.domain.SleepStatus;
@@ -35,14 +37,14 @@ import com.medica.buttonsdk.interfs.Method;
 import com.medica.buttonsdk.interfs.ResultCallback;
 import com.medica.buttonsdk.interfs.SleepStatusListener;
 import com.medica.buttonsdk.interfs.UpgradeCallback;
-import com.medica.jni.milky.MilkyAnalysJni;
-import com.medica.jni.milky.MilkyAnalysOut;
+import com.medica.xiangshui.jni.AlgorithmUtils;
+import com.medica.xiangshui.jni.sleepdot.SleepDotAlgorithmOut;
 
 public class MainActivity extends Activity{
 	private static final String TAG = MainActivity.class.getSimpleName();
 	
 	private static final String[] ITEMS = { "搜索设备", "连接设备", "获取设备ID", "登录设备", "监测状态", "睡眠状态", "获取电量",
-		"停止采集", "查询概要信息", "查询详细信息", "睡眠分析", "设置自动监测", "设置智能闹钟", "当前版本", "固件升级", "断开连接", "同步时间"};
+		"停止采集", "查询概要信息", "查询详细信息", "睡眠分析", "设置自动监测", "设置智能闹钟", "当前版本", "固件升级", "断开连接", "同步时间","一键取数据"};
 	
 	private GridView gridView;
 	private GridAdapter adapter;
@@ -53,7 +55,7 @@ public class MainActivity extends Activity{
 	private static final int REQCODE_OPEN_BT = 1;
 	private static final int REQCODE_SEACH_DEVICE = 2;
 	
-	public static final int userId = 1;
+	public static final int userId = 25209;
 	
 	private Summary summary;
 	private Detail detail;
@@ -128,11 +130,14 @@ public class MainActivity extends Activity{
 				}else if(position == 9){//查询详细信息
 					btnHelper.queryHistoryDetail(summary, resultCallback);
 				}else if(position == 10){//睡眠分析
-					summary = new Summary();
-					detail = new Detail();
+					if(summary==null||detail==null){
+						summary = new Summary();
+						detail = new Detail();
+					}
+					
 					if(summary != null && detail != null){
-						MilkyAnalysOut analysis = MilkyAnalysJni.analysis(summary.startTime, detail);
-						int score = analysis == null ? -1 : analysis.sleepscore;
+						SleepDotAlgorithmOut analysis = AlgorithmUtils.analysis(summary.startTime, detail);
+						int score = analysis == null ? -1 : analysis.getSleepscore();
 						LogUtil.log(TAG+" analysis score:" + score);
 					}
 				}else if(position == 11){//自动开始监测
@@ -169,6 +174,14 @@ public class MainActivity extends Activity{
 					btnHelper.disconnect();
 				}else if(position == 16){//同步时间
 					btnHelper.syncTimeByThread(resultCallback);
+				} else if(position == 17){//一键取数据:整合取概要、详细和算法分析接口
+					Calendar calendar = Calendar.getInstance();
+					int endTime = (int) (calendar.getTimeInMillis() / 1000);
+					calendar.add(Calendar.DAY_OF_MONTH, -100);
+					int startTime = (int) (calendar.getTimeInMillis() / 1000);
+					LogUtil.log(TAG+" queryHistorySummary stime:" + dateFormat.format(new Date(startTime * 1000l))+
+							",etime:"+ dateFormat.format(new Date(endTime * 1000l)));
+					btnHelper.querySleepData(startTime, endTime, resultCallback);
 				}
 			}
 		}
@@ -299,6 +312,13 @@ public class MainActivity extends Activity{
 							Toast.makeText(MainActivity.this, "对时成功", Toast.LENGTH_SHORT).show();
 						}else{
 							Toast.makeText(MainActivity.this, "对时失败", Toast.LENGTH_SHORT).show();
+						}
+					} else if(method == Method.QUERY_DATA){
+						List<SleepData> datas = (List<SleepData>)result;
+						if(datas!=null&&datas.size()>0){
+							LogUtil.log(TAG+"分数:"+datas.get(0).getAnalys().getSleepscore());
+						} else{
+
 						}
 					}
 				}
