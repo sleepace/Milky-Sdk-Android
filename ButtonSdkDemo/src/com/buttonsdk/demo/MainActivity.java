@@ -37,7 +37,7 @@ import com.medica.buttonsdk.interfs.Method;
 import com.medica.buttonsdk.interfs.ResultCallback;
 import com.medica.buttonsdk.interfs.SleepStatusListener;
 import com.medica.buttonsdk.interfs.UpgradeCallback;
-import com.medica.xiangshui.jni.AlgorithmUtils;
+import com.medica.milky.jni.MilkyAlgorithmUtil;
 import com.medica.xiangshui.jni.sleepdot.SleepDotAlgorithmOut;
 
 public class MainActivity extends Activity{
@@ -136,7 +136,7 @@ public class MainActivity extends Activity{
 					}
 					
 					if(summary != null && detail != null){
-						SleepDotAlgorithmOut analysis = AlgorithmUtils.analysis(summary.startTime, detail);
+						SleepDotAlgorithmOut analysis = MilkyAlgorithmUtil.analysis(summary.startTime, detail);
 						int score = analysis == null ? -1 : analysis.getSleepscore();
 						LogUtil.log(TAG+" analysis score:" + score);
 					}
