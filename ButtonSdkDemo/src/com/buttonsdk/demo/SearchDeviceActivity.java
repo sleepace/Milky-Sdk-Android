@@ -85,12 +85,17 @@ public class SearchDeviceActivity extends Activity {
 		public void onBleScanFinish() {
 			// TODO Auto-generated method stub
 //			LogUtil.showMsg("onBleScanFinish-----------");
-			setProgressBarIndeterminateVisibility(false);
-			if(adapter.getCount() > 0){
-				SearchDeviceActivity.this.setTitle("请选择要连接的设备");
-			}else{
-				SearchDeviceActivity.this.setTitle("没有扫描到设备");
-			}
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					setProgressBarIndeterminateVisibility(false);
+					if(adapter.getCount() > 0){
+						SearchDeviceActivity.this.setTitle("请选择要连接的设备");
+					}else{
+						SearchDeviceActivity.this.setTitle("没有扫描到设备");
+					}
+				}
+			});
 		}
 	};
 	
