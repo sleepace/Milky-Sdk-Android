@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,63 +12,20 @@ import android.util.Log;
 
 public class LogUtil {
 
-    public static boolean logEnable = true;// = (SleepConfig.PACKAGE_ENVIRONMENT != 3);
-    public static final String TAG = "load_test";
+    public static boolean logEnable = true;
+    public static final String TAG = "SleepaceSdk";
 	public static final String LOG_DIR = Environment.getExternalStorageDirectory()+"/medica/SDKLog";
-
-    /**
-     * 是否让tag固定不变
-     */
-    public static boolean isTagConstant = false;
 
     private static final String TIME = new SimpleDateFormat("yyyy_MM_dd").format(new Date());
 
     public static void log(Object obj) {
         if (!logEnable) return;
-
-        if (obj == null) {
-            obj = "Objec is null";
-        }
-
+        
         String log = obj.toString();
         Log.e(TAG, log);
 
         //String filename = "yong_" + TIME + ".log";
         //saveLog(filename, log);
-    }
-
-
-    public static void logE(Object msg) {
-        if (!logEnable) return;
-//        int size = 150;
-//        for (int i = 0; i <= msg.toString().length() / size; i++) {
-//            int start = i * size;
-//            int end = (i + 1) * size;
-//            end = end >= msg.toString().length() ? msg.toString().length() : end;
-//            Log.e("Hao", msg.toString().substring(start, end));
-//        }
-        Log.e("Hao", msg.toString());
-    }
-
-
-    /**
-     * 打印bytebuffer
-     *
-     * @param buffer
-     */
-    public static void logByteBuffer(ByteBuffer buffer) {
-        if (!logEnable) return;
-        try {
-            buffer.position(0);
-            String str = "";
-            for (int i = 0; i < buffer.limit(); i++) {
-                str += String.format("%x ", buffer.get() & 0xff);
-            }
-            buffer.position(0);
-            logE("ByteBuffer内容：" + str);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
 
@@ -95,7 +51,6 @@ public class LogUtil {
 
             String time = System.currentTimeMillis()+"";
             log = "保存Log： " + time + "          " + log;
-            logE(log);
             fos.write(log.getBytes());
             fos.write("\r\n".getBytes());
             fos.flush();
@@ -109,52 +64,6 @@ public class LogUtil {
             e.printStackTrace();
         }
         return false;
-    }
-
-
-    public static void e(String tag, String msg) {
-        if (!logEnable) {
-            return;
-        }
-
-        if (isTagConstant) {
-            Log.e(TAG, tag + "   " + msg);
-        } else {
-            Log.e(tag, msg);
-        }
-    }
-
-    public static void eThrowable(String tag, String msg) {
-        if (!logEnable) {
-            return;
-        }
-
-        if (isTagConstant) {
-            Log.e(TAG, tag + "   " + msg,new Throwable());
-        } else {
-            Log.e(tag, msg,new Throwable());
-        }
-    }
-
-    public static void w(String tag, String msg) {
-
-        if (!logEnable) {
-            return;
-        }
-
-        if (isTagConstant) {
-            Log.w(TAG, tag + "   " + msg);
-        } else {
-            Log.w(tag, msg);
-        }
-    }
-
-    /**
-     * 以级别为 d 的形式输出LOG
-     */
-    public static void d(String msg) {
-//        if (!logEnable) return;
-        Log.e("HZL", msg);
     }
 
     public static String getCaller(){
